@@ -3,6 +3,7 @@
 
 using System.ComponentModel.Composition;
 using System.Text;
+using System.Windows.Media;
 using Microsoft.R.Components.InteractiveWorkflow;
 using Microsoft.VisualStudio.Language.StandardClassification;
 using Microsoft.VisualStudio.Text.Classification;
@@ -12,8 +13,8 @@ namespace Microsoft.VisualStudio.R.Package.Help {
     [Export(typeof(IVignetteCodeColorBuilder))]
     internal sealed class VignetteCodeColorBuilder: IVignetteCodeColorBuilder {
         private class CssCodeProperty {
-            public string CssClassName;
-            public string ClassificationTypeName;
+            public string CssClassName { get; }
+            public string ClassificationTypeName { get; }
 
             public CssCodeProperty(string cssClassName, string ctName) {
                 CssClassName = cssClassName;
@@ -21,7 +22,7 @@ namespace Microsoft.VisualStudio.R.Package.Help {
             }
         }
 
-        private static readonly CssCodeProperty[] _cssPropertyMap = new CssCodeProperty[] {
+        private static readonly CssCodeProperty[] _cssPropertyMap = {
             new CssCodeProperty("kw", PredefinedClassificationTypeNames.Keyword),
             new CssCodeProperty("fl", PredefinedClassificationTypeNames.Number),
             new CssCodeProperty("st", PredefinedClassificationTypeNames.String),
@@ -35,10 +36,10 @@ namespace Microsoft.VisualStudio.R.Package.Help {
             new CssCodeProperty("dv", PredefinedClassificationTypeNames.Number),
             new CssCodeProperty("cf", PredefinedClassificationTypeNames.Keyword),
             new CssCodeProperty("op", PredefinedClassificationTypeNames.Operator),
-            new CssCodeProperty("pp", PredefinedClassificationTypeNames.PreprocessorKeyword),
+            new CssCodeProperty("pp", PredefinedClassificationTypeNames.PreprocessorKeyword)
         };
 
-        private static readonly CssCodeProperty[] _prePropertyMap = new CssCodeProperty[] {
+        private static readonly CssCodeProperty[] _prePropertyMap = {
             new CssCodeProperty("keyword", PredefinedClassificationTypeNames.Keyword),
             new CssCodeProperty("number", PredefinedClassificationTypeNames.Number),
             new CssCodeProperty("string", PredefinedClassificationTypeNames.String),
@@ -46,7 +47,7 @@ namespace Microsoft.VisualStudio.R.Package.Help {
             new CssCodeProperty("comment", PredefinedClassificationTypeNames.Comment),
             new CssCodeProperty("identifier", PredefinedClassificationTypeNames.Identifier),
             new CssCodeProperty("operator", PredefinedClassificationTypeNames.Operator),
-            new CssCodeProperty("paren", PredefinedClassificationTypeNames.Operator),
+            new CssCodeProperty("paren", PredefinedClassificationTypeNames.Operator)
         };
 
         private readonly IRInteractiveWorkflowProvider _workflowProvider;
@@ -89,8 +90,8 @@ $@"pre .{cssCodeProp.CssClassName} {{
             return sb.ToString();
         }
 
-        private string CssColorFromBrush(System.Windows.Media.Brush brush) {
-            var sb = brush as System.Windows.Media.SolidColorBrush;
+        private string CssColorFromBrush(Brush brush) {
+            var sb = brush as SolidColorBrush;
             return Invariant($"rgb({sb.Color.R}, {sb.Color.G}, {sb.Color.B})");
         }
     }

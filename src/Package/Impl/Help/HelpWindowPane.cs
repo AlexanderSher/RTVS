@@ -8,6 +8,7 @@ using Microsoft.R.Components.Help;
 using Microsoft.R.Components.InteractiveWorkflow;
 using Microsoft.R.Host.Client;
 using Microsoft.VisualStudio.Imaging;
+using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.R.Package.Commands;
 using Microsoft.VisualStudio.R.Package.Interop;
 using Microsoft.VisualStudio.R.Package.Shell;
@@ -30,7 +31,17 @@ namespace Microsoft.VisualStudio.R.Package.Help {
         protected override void OnCreate() {
             Component = new HelpVisualComponent { Container = this };
             ToolBarCommandTarget = new CommandTargetToOleShim(null, Component.Controller);
+            VSColorTheme.ThemeChanged += OnColorThemeChanged;
             base.OnCreate();
+        }
+
+        protected override void OnClose() {
+            base.OnClose();
+            VSColorTheme.ThemeChanged -= OnColorThemeChanged;
+        }
+
+        private void OnColorThemeChanged(ThemeChangedEventArgs e) {
+            Component.SetThemeColors();
         }
 
         public override bool SearchEnabled => true;

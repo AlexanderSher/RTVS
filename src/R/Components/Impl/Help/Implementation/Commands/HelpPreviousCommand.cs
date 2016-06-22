@@ -9,7 +9,7 @@ using Microsoft.VisualStudio.R.Package.Commands;
 using Microsoft.VisualStudio.R.Packages.R;
 
 namespace Microsoft.VisualStudio.R.Package.Help {
-    internal sealed class HelpPreviousCommand : Command {
+    internal sealed class HelpPreviousCommand : IAsyncCommand {
         private IHelpVisualComponent _component;
 
         public HelpPreviousCommand(IHelpVisualComponent component) :

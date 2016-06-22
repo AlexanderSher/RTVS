@@ -11,20 +11,16 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
 using Microsoft.Common.Core;
-using Microsoft.Languages.Editor.Controller;
-using Microsoft.Languages.Editor.Tasks;
+using Microsoft.Common.Core.Shell;
+using Microsoft.Common.Wpf.Media;
 using Microsoft.R.Components.Controller;
 using Microsoft.R.Components.Help;
 using Microsoft.R.Components.Settings;
 using Microsoft.R.Components.View;
 using Microsoft.R.Host.Client;
-using Microsoft.R.Host.Client.Session;
-using Microsoft.R.Support.Settings;
-using Microsoft.VisualStudio.PlatformUI;
+using Microsoft.R.Components.InteractiveWorkflow;
+using Microsoft.R.Wpf;
 using Microsoft.VisualStudio.R.Package.Browsers;
-using Microsoft.VisualStudio.R.Package.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using mshtml;
 using ContentControl = System.Windows.Controls.ContentControl;
 
 namespace Microsoft.VisualStudio.R.Package.Help {
@@ -39,13 +35,18 @@ namespace Microsoft.VisualStudio.R.Package.Help {
         /// </summary>
         private readonly ContentControl _windowContentControl;
         private readonly IVignetteCodeColorBuilder _codeColorBuilder;
+        private readonly IRSettings _settings;
+        private readonly IRInteractiveWorkflow _workflow;
+        private readonly ICoreShell _shell;
         private IRSession _session;
         private WindowsFormsHost _host;
 
-        public HelpVisualComponent() {
-            _codeColorBuilder = VsAppShell.Current.ExportProvider.GetExportedValue<IVignetteCodeColorBuilder>();
-
-            _session = VsAppShell.Current.ExportProvider.GetExportedValue<IRSessionProvider>().GetInteractiveWindowRSession();
+        public HelpVisualComponent(IVignetteCodeColorBuilder codeColorBuilder, IRInteractiveWorkflowProvider workflowProvider, IRSettings settings) {
+            _codeColorBuilder = codeColorBuilder;
+            _settings = settings;
+            _workflow = workflowProvider.GetOrCreate();
+            _shell = _workflow.Shell;
+            _session = _workflow.RSession;
             _session.Disconnected += OnRSessionDisconnected;
 
             _windowContentControl = new ContentControl();
@@ -56,11 +57,6 @@ namespace Microsoft.VisualStudio.R.Package.Help {
             Controller = c;
 
             CreateBrowser();
-            VSColorTheme.ThemeChanged += OnColorThemeChanged;
-        }
-
-        private void OnColorThemeChanged(ThemeChangedEventArgs e) {
-            SetThemeColors();
         }
 
         #region IVisualComponent
@@ -80,10 +76,10 @@ namespace Microsoft.VisualStudio.R.Package.Help {
         public void Navigate(string url) {
             // Filter out localhost help URL from absolute URLs
             // except when the URL is the main landing page.
-            if (RToolsSettings.Current.HelpBrowserType == HelpBrowserType.Automatic && IsHelpUrl(url)) {
+            if (_settings.HelpBrowserType == HelpBrowserType.Automatic && IsHelpUrl(url)) {
                 NavigateTo(url);
             } else {
-                var wbs = VsAppShell.Current.ExportProvider.GetExportedValue<IWebBrowserServices>();
+                var wbs = _shell.ExportProvider.GetExportedValue<IWebBrowserServices>();
                 wbs.OpenBrowser(WebBrowserRole.Shiny, url);
             }
         }
@@ -93,15 +89,16 @@ namespace Microsoft.VisualStudio.R.Package.Help {
 
         private void OnRSessionDisconnected(object sender, EventArgs e) {
             // Event fires on a background thread
-            VsAppShell.Current.DispatchOnUIThread(CloseBrowser);
+            _shell.DispatchOnUIThread(CloseBrowser);
         }
 
         private void CreateBrowser() {
             if (Browser == null) {
-                Browser = new WebBrowser();
+                Browser = new WebBrowser {
+                    WebBrowserShortcutsEnabled = true,
+                    IsWebBrowserContextMenuEnabled = true
+                };
 
-                Browser.WebBrowserShortcutsEnabled = true;
-                Browser.IsWebBrowserContextMenuEnabled = true;
 
                 Browser.Navigating += OnNavigating;
                 Browser.Navigated += OnNavigated;
@@ -111,8 +108,8 @@ namespace Microsoft.VisualStudio.R.Package.Help {
             }
         }
 
-        private void SetThemeColors() {
-            var doc = Browser?.Document?.DomDocument as IHTMLDocument2;
+        public void SetThemeColors() {
+            var doc = Browser?.Document;
 
             RemoveExistingStyles();
             AttachStandardStyles();
@@ -120,7 +117,7 @@ namespace Microsoft.VisualStudio.R.Package.Help {
 
             // The body may become null after styles are modified.
             // this happens if browser decides to re-render document.
-            if(doc?.body == null) {
+            if(doc?.Body == null) {
                 SetThemeColorsWhenReady();
             }
         }
@@ -129,6 +126,10 @@ namespace Microsoft.VisualStudio.R.Package.Help {
         /// Attaches theme-specific styles to the help page.
         /// </summary>
         private void AttachStandardStyles() {
+            if (Browser?.Document == null) {
+                return;
+            }
+
             var doc = Browser?.Document?.DomDocument as IHTMLDocument2;
             if (doc != null) {
                 string cssText = GetCssText();
@@ -185,7 +186,7 @@ namespace Microsoft.VisualStudio.R.Package.Help {
             if (VisualTheme != null) {
                 cssfileName = VisualTheme;
             } else {
-                Color defaultBackground = VSColorTheme.GetThemedColor(EnvironmentColors.ToolWindowBackgroundColorKey);
+                var defaultBackground = Colors.ToolWindowBackgroundColor;
                 // TODO: We can generate CSS from specific VS colors. For now, just do Dark and Light.
                 cssfileName = defaultBackground.GetBrightness() < 0.5 ? "Dark.css" : "Light.css";
             }
@@ -217,7 +218,7 @@ namespace Microsoft.VisualStudio.R.Package.Help {
             string url = e.Url.ToString();
             if (!IsHelpUrl(url)) {
                 e.Cancel = true;
-                var wbs = VsAppShell.Current.ExportProvider.GetExportedValue<IWebBrowserServices>();
+                var wbs = _shell.ExportProvider.GetExportedValue<IWebBrowserServices>();
                 wbs.OpenBrowser(WebBrowserRole.External, url);
             }
         }
@@ -230,8 +231,7 @@ namespace Microsoft.VisualStudio.R.Package.Help {
  
             // Upon navigation we need to ask VS to update UI so 
             // Back/Forward buttons become properly enabled or disabled.
-            IVsUIShell shell = VsAppShell.Current.GetGlobalService<IVsUIShell>(typeof(SVsUIShell));
-            shell.UpdateCommandUI(0);
+            Container.UpdateCommandStatus(false);
         }
 
         private void OnWindowUnload(object sender, HtmlElementEventArgs e) {
@@ -262,6 +262,7 @@ namespace Microsoft.VisualStudio.R.Package.Help {
             if (Browser == null) {
                 CreateBrowser();
             }
+
             Browser.Navigate(url);
         }
 
@@ -273,22 +274,19 @@ namespace Microsoft.VisualStudio.R.Package.Help {
             return uri.IsLoopback && uri.Port >= 10000 && uri.Port <= 32000 && !string.IsNullOrEmpty(uri.PathAndQuery);
         }
 
-        private IEnumerable<ICommand> GetCommands() {
-            List<ICommand> commands = new List<ICommand>() {
+        private IEnumerable<IAsyncCommand> GetCommands() {
+            return new List<IAsyncCommand> {
                 new HelpPreviousCommand(this),
                 new HelpNextCommand(this),
                 new HelpHomeCommand(this),
                 new HelpRefreshCommand(this)
             };
-            return commands;
         }
 
         public void Dispose() {
             DisconnectFromSessionEvents();
             CloseBrowser();
-            VSColorTheme.ThemeChanged -= OnColorThemeChanged;
         }
-
 
         private void DisconnectFromSessionEvents() {
             if (_session != null) {

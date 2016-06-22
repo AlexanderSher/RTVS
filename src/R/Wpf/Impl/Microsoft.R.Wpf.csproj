@@ -37,6 +37,7 @@
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Brushes.cs" />
+    <Compile Include="Colors.cs" />
     <Compile Include="Converters.cs" />
     <Compile Include="CommonResources.xaml.cs">
       <DependentUpon>CommonResources.xaml</DependentUpon>

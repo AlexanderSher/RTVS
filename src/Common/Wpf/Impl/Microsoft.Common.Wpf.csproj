@@ -25,6 +25,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
@@ -42,6 +43,7 @@
     <Compile Include="LambdaConverter\LambdaConverter.cs" />
     <Compile Include="LambdaConverter\LambdaExtension.cs" />
     <Compile Include="LambdaConverter\LambdaProperties.cs" />
+    <Compile Include="Media\ColorExtensions.cs" />
     <Compile Include="Threading\IMainThread.cs" />
     <Compile Include="Threading\MainThreadAwaitable.cs" />
     <Compile Include="Threading\MainThreadAwaiter.cs" />

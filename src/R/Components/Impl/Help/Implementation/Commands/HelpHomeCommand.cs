@@ -13,7 +13,7 @@ using Microsoft.VisualStudio.R.Package.Shell;
 using Microsoft.VisualStudio.R.Packages.R;
 
 namespace Microsoft.VisualStudio.R.Package.Help {
-    internal sealed class HelpHomeCommand : Command {
+    internal sealed class HelpHomeCommand : IAsyncCommand {
         public HelpHomeCommand(IHelpVisualComponent component) :
             base(new CommandId(RGuidList.RCmdSetGuid, RPackageCommandId.icmdHelpHome)) {
         }

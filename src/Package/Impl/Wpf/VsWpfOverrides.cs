@@ -6,18 +6,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Media;
 using Microsoft.Common.Core;
 using Microsoft.R.Wpf;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
+using Brushes = Microsoft.R.Wpf.Brushes;
+using Colors = Microsoft.R.Wpf.Colors;
 
 namespace Microsoft.VisualStudio.R.Package.Wpf {
     public static class VsWpfOverrides {
         private static readonly Lazy<Assembly> ExtensionsExplorerUIAssemblyLazy = Lazy.Create(() => AppDomain.CurrentDomain.Load("Microsoft.VisualStudio.ExtensionsExplorer.UI"));
 
         public static void Apply() {
+            OverrideColors();
             OverrideBrushes();
             OverrideStyleKeys();
+        }
+
+        private static void OverrideColors() {
+            Colors.ToolWindowBackgroundColor = GetColor(EnvironmentColors.ToolWindowBackgroundColorKey);
         }
 
         private static void OverrideBrushes() {
@@ -77,6 +85,11 @@ namespace Microsoft.VisualStudio.R.Package.Wpf {
             return colorResources.GetProperties(BindingFlags.Public | BindingFlags.Static)
                 .Where(p => p.PropertyType == typeof(ThemeResourceKey))
                 .ToDictionary(p => p.Name, p => (ThemeResourceKey)p.GetValue(null));
+        }
+
+        private static Color GetColor(ThemeResourceKey key) {
+            var color = VSColorTheme.GetThemedColor(key);
+            return Color.FromArgb(color.A, color.R, color.G, color.B);
         }
     }
 }

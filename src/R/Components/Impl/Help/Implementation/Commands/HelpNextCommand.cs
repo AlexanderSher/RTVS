@@ -11,23 +11,23 @@ using Microsoft.VisualStudio.R.Package.Commands;
 using Microsoft.VisualStudio.R.Packages.R;
 
 namespace Microsoft.VisualStudio.R.Package.Help {
-    internal sealed class HelpRefreshCommand : Command {
+    internal sealed class HelpNextCommand : IAsyncCommand {
         private IHelpVisualComponent _component;
 
-        public HelpRefreshCommand(IHelpVisualComponent component) :
-            base(new CommandId(RGuidList.RCmdSetGuid, RPackageCommandId.icmdHelpRefresh)) {
+        public HelpNextCommand(IHelpVisualComponent component) :
+            base(new CommandId(RGuidList.RCmdSetGuid, RPackageCommandId.icmdHelpNext)) {
             _component = component;
         }
 
         public override CommandStatus Status(Guid group, int id) {
-            if (_component.Browser != null && _component.Browser.Url != null) {
+            if (_component.Browser != null && _component.Browser.CanGoForward) {
                 return CommandStatus.SupportedAndEnabled;
             }
             return CommandStatus.Supported;
         }
 
         public override CommandResult Invoke(Guid group, int id, object inputArg, ref object outputArg) {
-            _component.Browser.Refresh();
+            _component.Browser.GoForward();
             return CommandResult.Executed;
         }
     }
