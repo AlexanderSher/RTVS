@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using System;
 using System.IO;
 using System.Security;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ using Microsoft.R.Interpreters;
 using Microsoft.UnitTests.Core.XUnit;
 
 namespace Microsoft.R.Host.Client.Test.Fixtures {
-    public class RemoteBrokerFixture : IMethodFixtureFactory<IRemoteBroker> {
+    public class RemoteBrokerFixture : IMethodFixtureFactory<IRemoteBroker>, IDisposable {
         private readonly BinaryAsyncLock _connectLock = new BinaryAsyncLock();
         private readonly IFileSystem _fileSystem;
         private readonly RInstallation _installations;
@@ -53,5 +54,7 @@ namespace Microsoft.R.Host.Client.Test.Fixtures {
                 lockToken.Reset();
             }
         }
+
+        public void Dispose() => _process?.Stop();
     }
 }

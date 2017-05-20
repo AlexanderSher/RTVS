@@ -4,6 +4,7 @@
 using System.Windows;
 using Microsoft.Common.Core;
 using Microsoft.Common.Core.Shell;
+using Microsoft.Common.Core.Threading;
 using Microsoft.R.Components.View;
 using Microsoft.R.Host.Client;
 using Microsoft.VisualStudio.InteractiveWindow;
@@ -14,7 +15,7 @@ using static System.FormattableString;
 namespace Microsoft.R.Components.InteractiveWorkflow.Implementation {
     public class RInteractiveWindowVisualComponent : IInteractiveWindowVisualComponent {
         private readonly IRSessionProvider _sessionProvider;
-        private readonly ICoreShell _shell;
+        private readonly IMainThread _mainThread;
 
         public FrameworkElement Control { get; }
         public IInteractiveWindow InteractiveWindow { get; }
@@ -30,7 +31,7 @@ namespace Microsoft.R.Components.InteractiveWorkflow.Implementation {
             Container = container;
 
             _sessionProvider = sessionProvider;
-            _shell = shell;
+            _mainThread = shell.MainThread();
             sessionProvider.BrokerStateChanged += OnBrokerChanged;
 
             var textView = interactiveWindow.TextView;
@@ -46,7 +47,7 @@ namespace Microsoft.R.Components.InteractiveWorkflow.Implementation {
         }
 
         private void OnBrokerChanged(object sender, BrokerStateChangedEventArgs e) {
-            _shell.MainThread().Post(() => UpdateWindowTitle(e.IsConnected));
+            _mainThread.Post(() => UpdateWindowTitle(e.IsConnected));
         }
 
         private void UpdateWindowTitle(bool isConnected) {

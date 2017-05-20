@@ -90,9 +90,6 @@ namespace Microsoft.R.Host.Client.Test.Fixtures {
                     try {
                         process?.Kill();
                     } catch (Exception) {
-
-
-
                     } finally {
                         process?.Dispose();
                     }
@@ -111,6 +108,13 @@ namespace Microsoft.R.Host.Client.Test.Fixtures {
                 throw new RHostDisconnectedException(Resources.Error_UnableToStartBrokerException.FormatInvariant(_name, process.ExitCode), new Win32Exception(process.ExitCode));
             }
             return process;
+        }
+
+        public void Stop() {
+            try {
+                _brokerProcess?.Kill();
+            } catch (Exception) {}
+            _brokerProcess?.Dispose();
         }
     }
 }
