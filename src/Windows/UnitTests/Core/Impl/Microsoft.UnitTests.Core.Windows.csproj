@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5EF2AD64-D6FE-446B-B350-8C7F0DF0834D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Microsoft.UnitTests.Core</RootNamespace>
+    <AssemblyName>Microsoft.UnitTests.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <Import Project="..\..\..\..\R.Settings.props" />
+  <ItemGroup>
+    <Compile Include="$(SourceDirectory)AssemblyVersionInfo.cs">
+      <Link>Properties\AssemblyVersionInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="Threading\TestMainThread.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="project.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="EventTaskSources.cs" />
+    <Compile Include="FluentAssertions\ActionAssertionsExtensions.cs" />
+    <Compile Include="FluentAssertions\AsyncAssertions.cs" />
+    <Compile Include="FluentAssertions\CollectionAssertionsExtensions.cs" />
+    <Compile Include="FluentAssertions\FluentAssertionExtensions.cs" />
+    <Compile Include="FluentAssertions\GivenSelectorExtensions.cs" />
+    <Compile Include="FluentAssertions\ObjectAssertionsExtensions.cs" />
+    <Compile Include="FluentAssertions\TaskAssertionsBase.cs" />
+    <Compile Include="FluentAssertions\TaskAssertionsExtensions.cs" />
+    <Compile Include="Mef\CatalogFactory.cs" />
+    <Compile Include="Mef\PartMetadataAttributeNames.cs" />
+    <Compile Include="NativeMethods.cs" />
+    <Compile Include="NSubstitute\SubstituteExtensions.cs" />
+    <Compile Include="NSubstitute\SubstituteHelper.cs" />
+    <Compile Include="NSubstitute\Mef\MefSubstituteBuilder.AddValueFactory.cs" />
+    <Compile Include="NSubstitute\Mef\ImportDefinitionConstraintAnalyser.cs" />
+    <Compile Include="NSubstitute\Mef\MefSubstitute.cs" />
+    <Compile Include="NSubstitute\Mef\MefSubstituteBuilder.cs" />
+    <Compile Include="NSubstitute\Mef\NSubstituteCompositionContainer.cs" />
+    <Compile Include="NSubstitute\Mef\NSubstituteExportProvider.cs" />
+    <Compile Include="Paths.cs" />
+    <Compile Include="ProcessUtils.cs" />
+    <Compile Include="Random.cs" />
+    <Compile Include="Threading\ControlledTaskScheduler.cs" />
+    <Compile Include="Threading\ControlledTaskSchedulerExtensions.cs" />
+    <Compile Include="Threading\ParallelTools.cs" />
+    <Compile Include="Threading\UIThreadHelper.cs" />
+    <Compile Include="Threading\UIThreadTools.cs" />
+    <Compile Include="UI\ContainerHost.cs" />
+    <Compile Include="Mef\IExportProvider.cs" />
+    <Compile Include="XUnit\MessageBusInjections\VerifyGlobalProviderMessageBusInjection.cs" />
+    <Compile Include="XUnit\MethodFixtures\ContainerHostMethodFixture.cs" />
+    <Compile Include="XUnit\MethodFixtures\TestMethodFixture.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Common\Core\Impl\Microsoft.R.Common.Core.csproj">
+      <Project>{C2A86AAB-A537-418D-A1EF-14540D340CB1}</Project>
+      <Name>Microsoft.R.Common.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\UnitTests\Core\Impl\Microsoft.UnitTests.Core.csproj">
+      <Project>{ba00d86b-01a7-43ae-9ab1-ad114eb14623}</Project>
+      <Name>Microsoft.UnitTests.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Core\Impl\Microsoft.R.Common.Core.Windows.csproj">
+      <Project>{01e3d8c2-9c24-492b-b13b-c6d7068b6bf8}</Project>
+      <Name>Microsoft.R.Common.Core.Windows</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SourceDirectory)R.Build.Version.targets" />
+  <Import Project="$(SourceDirectory)R.Build.Sign.targets" />
+</Project>

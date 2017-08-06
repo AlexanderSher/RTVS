@@ -4,12 +4,13 @@
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Security.Permissions;
 using Microsoft.Common.Core.Disposables;
 
 namespace Microsoft.UnitTests.Core.XUnit {
     [ExcludeFromCodeCoverage]
-    [HostProtection(Synchronization = true)]
+#if !NETSTANDARD1_6
+    [System.Security.Permissions.HostProtection(Synchronization = true)]
+#endif
     internal class TestTraceListener : TraceListener {
         private static IDisposable _instance;
         private static readonly object SyncObj = new object();
@@ -38,11 +39,11 @@ namespace Microsoft.UnitTests.Core.XUnit {
                 }
             });
 
+#if !NETSTANDARD1_6
             EventHandler restore = (o, e) => disposable.Dispose();
-
-            AppDomain.CurrentDomain.DomainUnload += restore;
             AppDomain.CurrentDomain.ProcessExit += restore;
-
+            AppDomain.CurrentDomain.DomainUnload += restore;
+#endif
             return disposable;
         }
 

@@ -7,7 +7,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.UnitTests.Core.XUnit.MethodFixtures;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 

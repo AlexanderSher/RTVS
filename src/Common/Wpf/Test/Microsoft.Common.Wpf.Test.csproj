@@ -33,13 +33,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\UnitTests\Core\Impl\Microsoft.UnitTests.Core.csproj">
+    <ProjectReference Include="..\..\..\Windows\UnitTests\Core\Impl\Microsoft.UnitTests.Core.Windows.csproj">
       <Project>{5EF2AD64-D6FE-446B-B350-8C7F0DF0834D}</Project>
-      <Name>Microsoft.UnitTests.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Core\Impl\Microsoft.R.Common.Core.csproj">
-      <Project>{8D408909-459F-4853-A36C-745118F99869}</Project>
-      <Name>Microsoft.Common.Core</Name>
+      <Name>Microsoft.UnitTests.Core.Windows</Name>
     </ProjectReference>
     <ProjectReference Include="..\Impl\Microsoft.Common.Wpf.csproj">
       <Project>{9de5e0b5-c8bd-482c-85c3-b8e20f08453b}</Project>
